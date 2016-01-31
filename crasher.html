@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Browser Crasher</title>
+<script src="testpages.js"></script>
+<script>
+var delay = 500;
+var curTest;
+function init() {
+    document.getElementById("startwith").value = localStorage instanceof Storage && localStorage.getItem("lasttest") || 0;
+    document.getElementById("sumtests").textContent = testfiles.length;
+}
+
+function delaychange() {
+    delay = document.getElementById("delayslider").value;
+    document.getElementById("delay").textContent = delay;
+}
+
+function go() {
+    curTest = Number(document.getElementById("startwith").value);
+    nextTest();
+}
+
+function nextTest() {
+    if (curTest >= testfiles.length) {
+	finish();
+    } else {
+	var test = testfiles[curTest];
+	if (localStorage instanceof Storage) {
+	    localStorage.setItem("lasttest", curTest);
+	}
+	document.getElementById("current").textContent = curTest;
+	document.getElementById("frm").src = test;
+
+	curTest++;
+	setTimeout(nextTest, delay);	// TODO: should be triggered via onload/onerror of frame
+    }
+}
+
+function finish() {
+    document.getElementById("current").textContent = "Finished!";
+}
+</script>
+</head>
+<body onload="init()">
+<h1>Browser Crasher</h1>
+<p>This page iterates over all test URLs given in testpages.js. The primary intention was to run crashing tests from browser test suites. Run getcrashers.sh with a path to a test suite to update.</p>
+
+Start with: <input id="startwith"> Delay: <span id="delay">500</span>ms <input id="delayslider" onchange="delaychange()" type="range" min="50" max="5000" value="500"> <button type="button" onclick="go()">Go!</button><br><br>
+
+Test <span id="current">-</span>/<span id="sumtests"></span><br><br>
+
+<iframe id="frm" width="80%" height="600px"></iframe>
+
+</body>
